@@ -82,6 +82,7 @@ class App(tk.Tk):
         self.w2.place(x=225, y=333, anchor='c')
         self.w3.place(x=500, y=333, anchor='c')
         self.w4.place(x=775, y=333, anchor='c')
+        self.w12.bind('<KeyRelease>','')
         self.w16.config(text='Submit')
 
     def addClick(self):
@@ -89,6 +90,7 @@ class App(tk.Tk):
             if self.bookId.get().strip()!='' and self.bookTitle.get().strip()!='' and self.Author.get().strip()!='':
                 try:
                     cursor.execute("INSERT INTO binf(B_Id,B_Ttl,Author,Status) VALUES (%s,%s,%s,%s);",(self.bookId.get(),self.bookTitle.get(),self.Author.get(),self.options.get()))
+                    mydb.commit()
                 except mysql.connector.DataError:
                     messagebox.showerror(title='Error',message='Word Limit Exceeded')
                 except mysql.connector.IntegrityError:
@@ -133,12 +135,14 @@ class App(tk.Tk):
         def dbDel():
             if check():
                 cursor.execute("DELETE FROM `binf` WHERE B_Id=%s;",(self.bookId.get(),))
+                mydb.commit()
                 messagebox.showinfo(title='Success',message='Deleted Entry')
             else:
                 messagebox.showerror(title='Error',message=f'Book Id {self.bookId.get()} does not exist')
         def dbMod():
             if check():
                 cursor.execute("UPDATE binf SET B_Ttl=%s, Author=%s, Status=%s WHERE B_Id=%s;",(self.bookTitle.get(),self.Author.get(),self.options.get(),self.bookId.get()))
+                mydb.commit()
                 messagebox.showinfo(title='Success',message='Modified Entry')
             else:
                 messagebox.showerror(title='Error',message=f'Book Id {self.bookId.get()} does not exist')
@@ -224,6 +228,7 @@ class App(tk.Tk):
         try:
             for i in k:
                 cursor.execute("INSERT INTO binf(B_Id,B_Ttl,Author,Status) VALUES (%s,%s,%s,%s);",(i[0],i[1],i[2],i[3]))
+                mydb.commit()
         except mysql.connector.IntegrityError:
             messagebox.showerror(title='Error', message='File Conflicting With Exsisting Data')
         f.close()
